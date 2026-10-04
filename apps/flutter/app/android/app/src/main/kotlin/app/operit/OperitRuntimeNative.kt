@@ -23,6 +23,8 @@ object OperitRuntimeNative {
     @JvmStatic external fun destroy(handle: Long)
     /** Creates a retained direct FFI connection to the host runtime. */
     @JvmStatic external fun connectCoreFfi(handle: Long): String
+    /** Publishes the live Android Shizuku authorization state to the native runtime. */
+    @JvmStatic external fun setAndroidShizukuAvailable(available: Boolean)
 
 
     @JvmStatic external fun emitRuntimeEvent(handle: Long, eventJson: String): String

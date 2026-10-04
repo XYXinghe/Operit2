@@ -270,6 +270,15 @@ pub unsafe extern "system" fn Java_app_operit_OperitRuntimeNative_emitHostRuntim
     }
 }
 
+#[no_mangle]
+pub unsafe extern "system" fn Java_app_operit_OperitRuntimeNative_setAndroidShizukuAvailable(
+    _env: JNIEnv,
+    _class: JClass,
+    available: jni::sys::jboolean,
+) {
+    operit_host_api::setAndroidShizukuAvailable(available == jni::sys::JNI_TRUE);
+}
+
 fn new_java_string(mut env: JNIEnv, value: &str) -> jstring {
     env.new_string(value)
         .expect("JNI string allocation must succeed")

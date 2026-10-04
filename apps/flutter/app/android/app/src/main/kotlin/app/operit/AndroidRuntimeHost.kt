@@ -69,6 +69,9 @@ class AndroidRuntimeHost(context: Context) {
             updateRuntimeStartupStatus("preparingAssets", "正在准备本地运行时资源")
             Log.i(TAG, "native runtime create start")
             try {
+                OperitRuntimeNative.setAndroidShizukuAvailable(
+                    AndroidPrivilegeAuthorization.isShizukuAuthorized(),
+                )
                 val paths = prepareAndroidRuntimePaths()
                 updateRuntimeStartupStatus("initializingCore", "正在初始化本地核心服务")
                 Log.i(

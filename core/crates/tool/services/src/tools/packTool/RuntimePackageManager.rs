@@ -5341,7 +5341,7 @@ fn buildConditionCapabilitiesSnapshot(
         ),
         (
             "android.shizuku_available".to_string(),
-            ConditionValue::Bool(false),
+            ConditionValue::Bool(operit_host_api::androidShizukuAvailable()),
         ),
         ("ui.shower_display".to_string(), ConditionValue::Bool(false)),
     ])

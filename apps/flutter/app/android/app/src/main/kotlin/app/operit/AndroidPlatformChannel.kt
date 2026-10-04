@@ -365,6 +365,9 @@ class AndroidPlatformChannel(
                     pendingShizukuAuthorizationListener = null
                     val pendingResult = pendingShizukuAuthorizationResult
                     pendingShizukuAuthorizationResult = null
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        OperitRuntimeNative.setAndroidShizukuAvailable(true)
+                    }
                     pendingResult?.success(null)
                 }
             }
@@ -373,6 +376,22 @@ class AndroidPlatformChannel(
         try {
             Shizuku.addRequestPermissionResultListener(listener)
             Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST_CODE)
+            mainHandler.postDelayed(
+                {
+                    if (pendingShizukuAuthorizationResult !== result) {
+                        return@postDelayed
+                    }
+                    Shizuku.removeRequestPermissionResultListener(listener)
+                    pendingShizukuAuthorizationListener = null
+                    pendingShizukuAuthorizationResult = null
+                    result.error(
+                        "SHIZUKU_AUTHORIZATION_REQUEST_TIMEOUT",
+                        "Shizuku permission request timed out without a result",
+                        null,
+                    )
+                },
+                SHIZUKU_AUTHORIZATION_TIMEOUT_MS,
+            )
         } catch (error: Throwable) {
             Shizuku.removeRequestPermissionResultListener(listener)
             pendingShizukuAuthorizationListener = null
@@ -644,5 +663,7 @@ class AndroidPlatformChannel(
         private const val ONBOARDING_PERMISSION_REQUEST_CODE = 2407
         private const val SHIZUKU_PERMISSION_REQUEST_CODE = 2408
         private const val ROOT_AUTHORIZATION_TIMEOUT_MS = 10_000L
+        private const val SHIZUKU_AUTHORIZATION_TIMEOUT_MS = 60_000L
+        private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
     }
 }

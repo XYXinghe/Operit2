@@ -49,6 +49,9 @@ class _ToolSettingsPanelState extends State<ToolSettingsPanel> {
   }
 
   void _reload() {
+    if (!mounted) {
+      return;
+    }
     setState(() {
       _future = _load();
     });
@@ -63,7 +66,24 @@ class _ToolSettingsPanelState extends State<ToolSettingsPanel> {
 
   Future<void> _requestHostAuthorization(_HostRequirement requirement) async {
     final data = await _future!;
-    await _HostAuthorizationBridge.request(data.host.id, requirement.id);
+    try {
+      await _HostAuthorizationBridge.request(data.host.id, requirement.id);
+    } on PlatformException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error.message ?? 'Host authorization request failed: ${error.code}',
+          ),
+        ),
+      );
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
     _reload();
   }
 

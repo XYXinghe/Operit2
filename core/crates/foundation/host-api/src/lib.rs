@@ -63,6 +63,18 @@ pub fn setHostConsoleLogSink(sink: HostConsoleLogSink) {
     *holder.write().expect("host console log sink lock poisoned") = Some(sink);
 }
 
+static ANDROID_SHIZUKU_AVAILABLE: AtomicBool = AtomicBool::new(false);
+
+/// Updates the live Android Shizuku authorization state reported by the host.
+pub fn setAndroidShizukuAvailable(available: bool) {
+    ANDROID_SHIZUKU_AVAILABLE.store(available, Ordering::Release);
+}
+
+/// Returns whether Android Shizuku is currently authorized for condition snapshots.
+pub fn androidShizukuAvailable() -> bool {
+    ANDROID_SHIZUKU_AVAILABLE.load(Ordering::Acquire)
+}
+
 /// Emits one runtime log record through the host-owned live console sink.
 pub fn tryLogHostConsole(priority: i32, tag: &str, message: &str) -> bool {
     let sink = HOST_CONSOLE_LOG_SINK
